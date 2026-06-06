@@ -1,47 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-    <property name="LOGS" value="logs" />
-    <property name="DOCKER_LOGS" value="./logs" />
+<configuration debug="false" scan="false">
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <property name="LOGS" value="${LOGS_DIR:-logs}" />
+    <property name="DOCKER_LOGS" value="${DOCKER_LOGS_DIR:-./logs}" />
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <springProperty scope="context" name="application_name" source="spring.application.name"/>
 
     <!-- Log configuration for non-Docker profile -->
     <springProfile name="!docker">
+        <property name="CUSTOM_KEY_DEFAULT" value="${application_name:-defaultApp}" />
         <property name="CONSOLE_LOG_PATTERN"
-                  value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+                  value="%clr(%d{MM-dd HH:mm:ss.SSS}){faint} [%X{customKey:-${CUSTOM_KEY_DEFAULT}}] %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(-){faint} %clr([%t]){faint} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+        <property name="FILE_LOG_PATTERN"
+                  value="%d{HH:mm:ss.SSS} [%X{customKey:-${CUSTOM_KEY_DEFAULT}}] %p [%t]: %m%n"/>
 
-        <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-                <Pattern>%d %p %C{1} [%t] %m%n</Pattern>
+        <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>utf8</charset>
             </encoder>
+        </appender>
 
+        <appender name="infoFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <Pattern>${FILE_LOG_PATTERN}</Pattern>
+            </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                 <!-- rollover daily and when the file reaches 10 MegaBytes -->
-                <fileNamePattern>${LOGS}/${application_name}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>${LOGS}/${application_name}-%d{yyyy-MM-dd}.%i.log
+                </fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>10MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
             </rollingPolicy>
         </appender>
 
-        <appender name="flatConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-                <charset>utf8</charset>
-            </encoder>
-        </appender>
+        <!-- Appender riêng cho ERROR level -->
+        <!--        <appender name="errorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+        <!--            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
+        <!--                <Pattern>${FILE_LOG_PATTERN}</Pattern>-->
+        <!--            </encoder>-->
+
+        <!--            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+        <!--                <fileNamePattern>${LOGS}/${application_name}-ERROR-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
+        <!--                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+        <!--                    <maxFileSize>10MB</maxFileSize>-->
+        <!--                </timeBasedFileNamingAndTriggeringPolicy>-->
+        <!--            </rollingPolicy>-->
+        <!--        </appender>-->
+
         <root level="INFO">
-            <appender-ref ref="RollingFile" />
-            <appender-ref ref="flatConsoleAppender"/>
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="infoFileAppender"/>
+            <!--            <appender-ref ref="errorFile"/>-->
         </root>
-<!--        <logger name="com.lbs" level="DEBUG">-->
-<!--            <appender-ref ref="RollingFile" />-->
-<!--            <appender-ref ref="flatConsoleAppender"/>-->
-<!--        </logger>-->
-        <!-- <logger name="org.springframework.security" level="INFO">
-            <appender-ref ref="RollingFile" />
-            <appender-ref ref="flatConsoleAppender" />
-        </logger>  -->
+
+        <!--        <logger level="ERROR" name="com.flowiee" additivity="false">-->
+        <!--            <appender-ref ref="errorFile"/>-->
+        <!--            <appender-ref ref="consoleAppender"/>-->
+        <!--        </logger>-->
+
     </springProfile>
 </configuration>

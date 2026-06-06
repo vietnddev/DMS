@@ -1,8 +1,8 @@
 package com.flowiee.dms.config;
 
-import com.flowiee.dms.entity.system.Account;
-import com.flowiee.dms.model.UserPrincipal;
-import com.flowiee.dms.repository.system.AccountRepository;
+import com.flowiee.dms.account.entity.Account;
+import com.flowiee.dms.audit.model.UserPrincipal;
+import com.flowiee.dms.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;

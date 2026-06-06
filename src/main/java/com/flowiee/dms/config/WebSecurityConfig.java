@@ -1,7 +1,7 @@
 package com.flowiee.dms.config;
 
-import com.flowiee.dms.service.system.impl.UserDetailsServiceImpl;
-import com.flowiee.dms.utils.EndPointUtil;
+import com.flowiee.dms.account.service.impl.AccountServiceImpl;
+import com.flowiee.dms.common.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
-	UserDetailsServiceImpl userDetailsServiceImpl;
+	AccountServiceImpl userDetailsServiceImpl;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -56,27 +56,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		//httpSecurity.headers().frameOptions().sameOrigin();
 
 		httpSecurity
-				.cors().and()
+				.cors()
+				.and()
 				.csrf().disable()
-				.headers().frameOptions().sameOrigin().and() //Cấu hình phần này để có thể nhúng URL vào các thẻ như iframe,..
+				.headers().frameOptions().sameOrigin()
+				.and() //Cấu hình phần này để có thể nhúng URL vào các thẻ như iframe,..
 				.authorizeRequests()
-				.antMatchers(EndPointUtil.SYS_CONFIG, EndPointUtil.SYS_ACCOUNT, EndPointUtil.SYS_LOG).hasRole("ADMIN")
+				.antMatchers(AppConstants.EP_SYS_CONFIG, AppConstants.EP_SYS_ACCOUNT, AppConstants.EP_SYS_LOG).hasRole("ADMIN")
 				.antMatchers("/build/**", "/dist/**", "/js/**", "/plugins/**", "/uploads/**", "/actuator/**", "/swagger-ui/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				//Page login
-				.formLogin().loginPage(EndPointUtil.SYS_LOGIN).permitAll()
+				.formLogin().loginPage(AppConstants.EP_SYS_LOGIN).permitAll()
 				//Login OK thì redirect vào page danh sách sản phẩm
 				.defaultSuccessUrl("/stg/doc")
-				.failureUrl(EndPointUtil.SYS_LOGIN + "?success=fail")
+				.failureUrl(AppConstants.EP_SYS_LOGIN + "?success=fail")
 				.loginProcessingUrl("/j_spring_security_check")
 				.authenticationDetailsSource(authenticationDetailsSource())
 				.and()
 				.httpBasic()
 				.and()
 				.logout()
-				.logoutUrl(EndPointUtil.SYS_LOGOUT) // Endpoint cho đăng xuất
-				.logoutSuccessUrl(EndPointUtil.SYS_LOGIN) // Đường dẫn sau khi đăng xuất thành công
+				.logoutUrl(AppConstants.EP_SYS_LOGOUT) // Endpoint cho đăng xuất
+				.logoutSuccessUrl(AppConstants.EP_SYS_LOGIN) // Đường dẫn sau khi đăng xuất thành công
 				.deleteCookies("JSESSIONID") // Xóa cookies sau khi đăng xuất
 				.invalidateHttpSession(true) // Hủy phiên làm việc
 				.and()
