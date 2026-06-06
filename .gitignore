@@ -37,3 +37,4 @@ build/
 *.zip
 src/main/resources/static/uploads/
 src/main/resources/static/downloads/
+*.log

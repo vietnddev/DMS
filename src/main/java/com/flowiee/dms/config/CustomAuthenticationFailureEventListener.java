@@ -1,11 +1,11 @@
 package com.flowiee.dms.config;
 
-import com.flowiee.dms.entity.system.Account;
-import com.flowiee.dms.entity.system.SystemConfig;
-import com.flowiee.dms.repository.system.AccountRepository;
-import com.flowiee.dms.repository.system.SystemConfigRepository;
-import com.flowiee.dms.utils.constants.AccountStatus;
-import com.flowiee.dms.utils.constants.ConfigCode;
+import com.flowiee.dms.account.entity.Account;
+import com.flowiee.dms.config.entity.SystemConfig;
+import com.flowiee.dms.account.repository.AccountRepository;
+import com.flowiee.dms.config.repository.SystemConfigRepository;
+import com.flowiee.dms.common.utils.constants.AccountStatus;
+import com.flowiee.dms.common.utils.constants.ConfigCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
